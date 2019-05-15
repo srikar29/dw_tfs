@@ -6,7 +6,7 @@ dsn_database = "DM_SALES"
 dsn_hostname = "xdpapl0165-vip.tfs.toyota.com" 
 dsn_port = "5480"                
 dsn_uid = "nimmags1"        
-dsn_pwd = "July29@2018"      
+dsn_pwd = "XXXXXXX"      
 jdbc_driver_name = "org.netezza.Driver"
 jdbc_driver_loc = "C:/JDBC/nzjdbc.jar"
 
