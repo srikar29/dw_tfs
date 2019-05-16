@@ -1,0 +1,48 @@
+import csv
+import jaydebeapi
+##The JayDeBeApi module allows you to connect from Python code to databases using Java JDBC. It provides a Python DB-API v2.0 to that database
+
+dsn_database = "DM_SALES"            
+dsn_hostname = "xdpapl0165-vip.tfs.toyota.com" 
+dsn_port = "5480"                
+dsn_uid = "nimmags1"        
+dsn_pwd = "XXXXXXX"      
+jdbc_driver_name = "org.netezza.Driver"
+jdbc_driver_loc = "C:/JDBC/nzjdbc.jar"
+
+##jdbc_driver_loc = "/Users/nimmags1/Downloads/netezza-3.5.0.jar/"
+###jdbc:netezza://" + server + "/" + dbName ;
+
+connection_string='jdbc:netezza://'+dsn_hostname+':'+dsn_port+'/'+dsn_database
+url = '{0}:user={1};password={2}'.format(connection_string, dsn_uid, dsn_pwd)
+print("URL: " + url)
+print("Connection String: " + connection_string)
+
+conn = jaydebeapi.connect("org.netezza.Driver", connection_string, {'user': dsn_uid, 'password': dsn_pwd},
+                         jars = "C:/JDBC/nzjdbc.jar")
+cursor = conn.cursor()
+#sql = "select MAX(a.dm_modified_date), (select distinct name From _v_relation_column where name =$TestParam1)
+#from $TestParam  a"
+
+cursor.execute("select distinct name as table_name from _v_relation_column where owner ='ADMIN' and database='DM_SALES' and (ATTNAME = 'DM_MODIFIED_DATE' ) and type <> 'VIEW' and name not like '%BKP%'and nvl(instr(translate(name,'1234567890','1111111111'),'1'),0) =0 limit 2")
+for row in cursor.fetchall():
+    #print (row[0])
+    sentim = (row[0])
+    #sentim = sentiment(row[0])
+    print (sentim)
+    cursor.execute("select MAX(dm_modified_date), (select distinct name From _v_relation_column where name ='" + (str(sentim)) + "' ) from "+ (str(sentim)) + ";")
+    #for row in cursor.fetchall():
+   #cursor.execute(sql)
+    row = cursor.fetchall()
+####Write to a file####
+    c=csv.writer(open("C:/users/nimmags1/Downloads/results.csv","w"),delimiter=";",lineterminator="\r\n")
+    c.writerows(row)
+
+
+#f = open('test.txt', 'w')
+#s = str(row)
+#f.write(s)
+#f.close()
+
+cursor.close()
+conn.close()
